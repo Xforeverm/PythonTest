@@ -12,11 +12,11 @@ redbook_username = 'yqx3954711@163.com'
 redbook_password = 'Yqx198716'
 scrm_url = 'https://scrm.wxb.com/'
 scrm_username = '18518279060'
-scrm_password = 'skdpy9060'
+scrm_password = 'qweasd123456'
 today = str(datetime.date.today())
 
 
-def getRedBookData() -> dict:
+def getRedBookData():
     login_url = 'https://customer.xiaohongshu.com/api/cas/loginWithAccount'  # login url
     session_url = 'https://ad.xiaohongshu.com/api/leona/session'  # session url
     final_url = 'https://ad.xiaohongshu.com/api/leona/rtb/campaign/list'  # request url
@@ -52,7 +52,7 @@ def getRedBookData() -> dict:
     return result
 
 
-def getScrmData() -> tuple:
+def getScrmData():
     pre_url = 'https://account.wxb.com/index2/preLogin'
     login_url = 'https://account.wxb.com/index2/login'
     info_url = 'https://account.wxb.com/user/info?'
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     scrm += ', ' + result['account']
 
     # database connect
-    conn = pymysql.connect(host='127.0.0.1', user='Crawler', password='SamkDf3e6GNNzzFS', port=3306, db='crawler',
+    conn = pymysql.connect(host='127.0.0.1', user='crawler', password='XA2zM2iXMiaWBhp2', port=3306, db='crawler',
                            charset='utf8')
     cursor = conn.cursor()
     sql = f"insert into qc_crawler (fee, impression, ctr, messageUser, initiativeMessage, messageConsultCpl, initiativeMessageCpl, add_customer , account, time) values ({result['fee']}, {result['impression']}, '{result['ctr']}', {result['messageUser']}, {result['initiativeMessage']}, {result['messageConsultCpl']}, {result['initiativeMessageCpl']}, {add_customer}, '{scrm}','{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}')"
@@ -104,7 +104,7 @@ if __name__ == '__main__':
         cursor.execute(sql)
         conn.commit()
     except Exception as e:
-        print(e.args)
+        print(e)
         conn.rollback()
     finally:
         if conn:
