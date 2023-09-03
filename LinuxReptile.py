@@ -53,9 +53,9 @@ def getRedBookData():
 
 
 def getScrmData():
+    info_url = 'https://account.wxb.com/user/info?'
     pre_url = 'https://account.wxb.com/index2/preLogin'
     login_url = 'https://account.wxb.com/index2/login'
-    info_url = 'https://account.wxb.com/user/info?'
     final_url = "https://api-scrm.wxb.com/stat/qwOverview?corp_id=30083&start_date=" + today + "&end_date=" + today
     pre_data = {
         'email': scrm_username,
@@ -76,9 +76,7 @@ def getScrmData():
     resu = requests.post(pre_url, data=pre_data, headers=headers)
     resu.close()
 
-    requests.post(login_url, data=pre_data, headers=headers)
-    resu = requests.get(info_url, headers=headers)
-    headers['Cookie'] += 'uinfo=' + resu.cookies.get('uinfo')
+    resu = requests.post(login_url, data=pre_data, headers=headers)
     resu.close()
 
     resu = requests.get(
@@ -95,7 +93,7 @@ if __name__ == '__main__':
     scrm += ', ' + result['account']
 
     # database connect
-    conn = pymysql.connect(host='127.0.0.1', user='crawler', password='XA2zM2iXMiaWBhp2', port=3306, db='crawler',
+    conn = pymysql.connect(host='101.42.7.42', user='crawler', password='XA2zM2iXMiaWBhp2', port=3306, db='crawler',
                            charset='utf8')
     cursor = conn.cursor()
     sql = f"insert into qc_crawler (fee, impression, ctr, messageUser, initiativeMessage, messageConsultCpl, initiativeMessageCpl, add_customer , account, time) values ({result['fee']}, {result['impression']}, '{result['ctr']}', {result['messageUser']}, {result['initiativeMessage']}, {result['messageConsultCpl']}, {result['initiativeMessageCpl']}, {add_customer}, '{scrm}','{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}')"
