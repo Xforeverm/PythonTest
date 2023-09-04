@@ -1,18 +1,9 @@
-from bs4 import BeautifulSoup as bf
-from my_fake_useragent import UserAgent
-import datetime
 import json
 import pymysql
-import urllib.request, urllib.error
 import requests
+import traceback
+from utils import *
 
-# basic information
-redbook_url = 'https://ad.xiaohongshu.com/'
-redbook_username = 'yqx3954711@163.com'
-redbook_password = 'Yqx198716'
-scrm_url = 'https://scrm.wxb.com/'
-scrm_username = '18518279060'
-scrm_password = 'qweasd123456'
 today = str(datetime.date.today())
 
 
@@ -88,22 +79,23 @@ def getScrmData():
 
 
 if __name__ == '__main__':
-    scrm, add_customer = getScrmData()
-    result = getRedBookData()
-    scrm += ', ' + result['account']
-
-    # database connect
     conn = pymysql.connect(host='101.42.7.42', user='crawler', password='XA2zM2iXMiaWBhp2', port=3306, db='crawler',
                            charset='utf8')
-    cursor = conn.cursor()
-    sql = f"insert into qc_crawler (fee, impression, ctr, messageUser, initiativeMessage, messageConsultCpl, initiativeMessageCpl, add_customer , account, time) values ({result['fee']}, {result['impression']}, '{result['ctr']}', {result['messageUser']}, {result['initiativeMessage']}, {result['messageConsultCpl']}, {result['initiativeMessageCpl']}, {add_customer}, '{scrm}','{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}')"
-    print(sql)
     try:
+        scrm, add_customer = getScrmData()
+        result = getRedBookData()
+        scrm += ', ' + result['account']
+
+        # database connect
+        cursor = conn.cursor()
+        sql = f"INSERT into qc_crawler (fee, impression, ctr, messageUser, initiativeMessage, messageConsultCpl, initiativeMessageCpl, add_customer , account, time) values ({result['fee']}, {result['impression']}, '{result['ctr']}', {result['messageUser']}, {result['initiativeMessage']}, {result['messageConsultCpl']}, {result['initiativeMessageCpl']}, {add_customer}, '{scrm}','{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}')"
+        print(sql)
         cursor.execute(sql)
         conn.commit()
     except Exception as e:
-        print(e)
+        print(traceback.format_exc())
         conn.rollback()
+        send_email(traceback.format_exc())
     finally:
         if conn:
             conn.close()
